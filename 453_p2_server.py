@@ -8,7 +8,7 @@ import socket
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ip = "10.0.0.15"
-port = 50001
+port = 50000
 address = (ip, port)
 
 server.bind(address)
@@ -25,22 +25,22 @@ while True:
 	print "    Processing data: "
 
 	if(data_del[0] == "+"):
-		client.send(int(data_del[1]) + int(data_del[2]))
+		client.send(str(int(data_del[1]) + int(data_del[2])))
 		print "    Processing done.\n[*] Reply sent"
 		client.close()
 		break
 	elif(data_del[0] == "-"):
-		client.send(int(data_del[1]) - int(data_del[2]))
+		client.send(str(int(data_del[1]) - int(data_del[2])))
 		print "    Processing done.\n[*] Reply sent"
 		client.close()
 		break
 	elif(data_del[0] == "*"):
-		client.send(int(data_del[1]) * int(data_del[2]))
+		client.send(str(int(data_del[1]) * int(data_del[2])))
 		print "    Processing done.\n[*] Reply sent"
 		client.close()
 		break
 	elif(data_del[0] == "/"):
-		client.send(int(data_del[1]) / int(data_del[2]))
+		client.send(str(int(data_del[1]) / int(data_del[2])))
 		print "    Processing done.\n[*] Reply sent"
 		client.close()
 		break
