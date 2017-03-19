@@ -5,20 +5,20 @@ import socket
 #send data to server
 #recieve data
 
-def main():
-	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # ?
-	ip=socket.gethostbyname("www.google.com")
-	port = 80
-	address=(ip, port)
 
-	client.connect(address)
-	client.send("GET / HTTP/1.1\r\nHost: google.com\r\n\r\n")
-	data = client.recv(1024)
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # ?
+ip=socket.gethostbyname(socket.gethostname())
+port = 50000
+address=(ip, port)
 
-	print data
+client.connect(address)
 
-	#raw_input() ?
+data_out = raw_input("Enter an operator and two numbers, in that order delimited by spaces: ")
 
+client.send(data_out)
 
-if  __name__ == '__main__':
-    main()
+data_in = client.recv(1024)
+
+client.close()
+
+print int(data_in)
