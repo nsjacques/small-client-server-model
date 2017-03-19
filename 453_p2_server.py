@@ -20,18 +20,32 @@ print "[*] Got a connection from ", addr_cl[0], ":", addr_cl[1]
 
 while True:
 	data = client.recv(1024)
-	print "[*] Recieved ", data, " from the client"
-	print "    Processing data"
+	data_del = data.split(" ")
+	print "[*] Recieved ", data_del[0], " ", data_del[1], " ", data_del[2], " from the client"
+	print "    Processing data: "
 
-	if(data == "Hello server"):
-		client.send("Hello client")
+	if(data_del[0] == "+"):
+		client.send(int(data_del[1]) + int(data_del[2]))
 		print "    Processing done.\n[*] Reply sent"
-	elif(data == "disconnect"):
-		client.send("Goodbye")
+		client.close()
+		break
+	elif(data_del[0] == "-"):
+		client.send(int(data_del[1]) - int(data_del[2]))
+		print "    Processing done.\n[*] Reply sent"
+		client.close()
+		break
+	elif(data_del[0] == "*"):
+		client.send(int(data_del[1]) * int(data_del[2]))
+		print "    Processing done.\n[*] Reply sent"
+		client.close()
+		break
+	elif(data_del[0] == "/"):
+		client.send(int(data_del[1]) / int(data_del[2]))
+		print "    Processing done.\n[*] Reply sent"
 		client.close()
 		break
 	else:
-		client.send("Invalid data")
+		client.send("Invalid data. Try again. \"Operator first second\"")
 		print "    Processing done. Invalid data.\n[*] Reply sent"
 
 server.close()
