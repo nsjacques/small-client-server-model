@@ -8,17 +8,25 @@ import socket
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # ?
 ip=socket.gethostbyname(socket.gethostname())
-port = 50000
+port = 50001
 address=(ip, port)
 
 client.connect(address)
 
-data_out = raw_input("Enter an operator and two numbers, in that order delimited by spaces: ")
+while(True):
+	data_out = raw_input("Enter an operator and two numbers, in that order delimited by spaces: ")
 
-client.send(data_out)
+	client.send(data_out)
 
-data_in = client.recv(1024)
+	data_in = client.recv(1024)
+
+	try:
+		print "Result", int(data_in)
+	except ValueError:
+		print data_in
+		if data_in == "Goodbye":
+			break
+
 
 client.close()
 
-print int(data_in)

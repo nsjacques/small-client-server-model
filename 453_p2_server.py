@@ -6,9 +6,16 @@ import socket
 #recieve data from client
 #send data to client
 
+def isInteger(value):
+	try:
+		int(value)
+		return True
+	except ValueError:
+		return False
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ip = "10.0.0.15"
-port = 50000
+port = 50001
 address = (ip, port)
 
 server.bind(address)
@@ -20,33 +27,49 @@ print "[*] Got a connection from ", addr_cl[0], ":", addr_cl[1]
 
 while True:
 	data = client.recv(1024)
+	if not data:
+		continue
 	data_del = data.split(" ")
-	print "[*] Recieved ", data_del[0], " ", data_del[1], " ", data_del[2], " from the client"
+
+	print "[*] Received \'", data, "\' from the client."
 	print "    Processing data: "
 
-	if(data_del[0] == "+"):
-		client.send(str(int(data_del[1]) + int(data_del[2])))
-		print "    Processing done.\n[*] Reply sent"
-		client.close()
-		break
-	elif(data_del[0] == "-"):
-		client.send(str(int(data_del[1]) - int(data_del[2])))
-		print "    Processing done.\n[*] Reply sent"
-		client.close()
-		break
-	elif(data_del[0] == "*"):
-		client.send(str(int(data_del[1]) * int(data_del[2])))
-		print "    Processing done.\n[*] Reply sent"
-		client.close()
-		break
-	elif(data_del[0] == "/"):
-		client.send(str(int(data_del[1]) / int(data_del[2])))
-		print "    Processing done.\n[*] Reply sent"
-		client.close()
-		break
+	if not (isInteger(data_del[1]) and isInteger(data_del[2])):
+		client.send("Noninteger operands. Try again. \"OC 1 2\"")
+		print "    Processing interrupted. Invalid data.\n[*] Reply sent"
 	else:
-		client.send("Invalid data. Try again. \"Operator first second\"")
-		print "    Processing done. Invalid data.\n[*] Reply sent"
+		if(data_del[0] == "+"):
+			client.send(str(int(data_del[1]) + int(data_del[2])))
+			print "    Processing done.\n[*] Reply sent"
+			#client.close()
+			#break
+		elif(data_del[0] == "-"):
+			client.send(str(int(data_del[1]) - int(data_del[2])))
+			print "    Processing done.\n[*] Reply sent"
+			#client.close()
+			#break
+		elif(data_del[0] == "*"):
+			client.send(str(int(data_del[1]) * int(data_del[2])))
+			print "    Processing done.\n[*] Reply sent"
+			#client.close()
+			#break
+		elif(data_del[0] == "/"):
+			if int(data_del[2]) == 0:
+				client.send("Attempted division by zero. Try again. \"OC 1 2\"")
+				print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+				continue
+			client.send(str(int(data_del[1]) / int(data_del[2])))
+			print "    Processing done.\n[*] Reply sent"
+			#client.close()
+			#break
+		elif(data_del[0] == "X"):
+			client.send("Goodbye")
+			print "    Processing done.\n[*] Reply sent"
+			client.close()
+			break
+		else:
+			client.send("Invalid operator. Try again. \"OC 1 2\"")
+			print "    Processing interrupted. Invalid data.\n[*] Reply sent"
 
 server.close()
 
