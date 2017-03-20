@@ -6,29 +6,33 @@ import socket
 #recieve data
 
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # ?
-ip=socket.gethostbyname(socket.gethostname())
-port = 50001
-address=(ip, port)
-
-client.connect(address)
-
 while(True):
-	data_out = raw_input("Enter an operator and two numbers, in that order delimited by spaces: ")
 
-	client.send(data_out)
+	client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	ip=socket.gethostbyname(socket.gethostname())
+	port = 50001
+	address=(ip, port)
 
-	data_in = client.recv(1024)
+	client.connect(address)
 
-	response = "Status Code: " + 
+	message = raw_input("Enter an operator and two numbers, in that order delimited by spaces (\'exit\' to disconnect): ")
+	if message.lower() == "exit":
+		client.close()
+		break
+	client.send(message)
 
-	try:
-		print "Result", int(data_in)
-	except ValueError:
-		print data_in
-		if data_in == "Goodbye":
-			break
+	response = client.recv(1024).split(" ")
+
+	if response[0] == "200":
+		print "Status Code: ", response[0], "\nResponse: ", response[1]
+
+	elif response[0] == "300":
+		print "Status Code: ", response[0], "\nResponse: ", response[1], "\nMessage: ", " ".join(response[2:])
+	else:
+		print "This should never happen"
+		print "rep[0]", response[0], " rep[1]", response[1]
+
+	client.close()
 
 
-client.close()
 

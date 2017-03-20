@@ -17,69 +17,63 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ip = "10.0.0.15"
 port = 50001
 address = (ip, port)
-
 server.bind(address)
-server.listen(2)
+
+server.listen(1)
 print "[*] Started listening on", ip, ":", port
 
-client, addr_cl = server.accept()
-print "[*] Got a connection from ", addr_cl[0], ":", addr_cl[1]
-
 while True:
+
+	client, addr_cl = server.accept()
+	print "[*] Got a connection from ", addr_cl[0], ":", addr_cl[1]
+
 	data = client.recv(1024)
 	if not data:
+		print "[*] Disconnected from ", addr_cl[0], ":", addr_cl[1]
+		client.close()
 		continue
-	data_del = data.split(" ")
+	data_split = data.split(" ")
 
 	print "[*] Received \'", data, "\' from the client."
 	print "    Processing data: "
 
-	if not (isInteger(data_del[1]) and isInteger(data_del[2])):
-		client.send("Noninteger operands. Try again. \"OC 1 2\"")
-		print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+	if len(data_split) != 3:
+		client.send("300 -1 Incorrect format. Try again. \"OC 1 2\"")
+		print "    Processing done. Invalid data.\n[*] Reply sent"
+		print "[*] Disconnected from ", addr_cl[0], ":", addr_cl[1]
+		client.close()
+		continue
+
+	if not (isInteger(data_split[1]) and isInteger(data_split[2])):
+		client.send("300 -1 Noninteger operands. Try again. \"OC 1 2\"")
+		print "    Processing done. Invalid data.\n[*] Reply sent"
 	else:
-		if(data_del[0] == "+"):
-			client.send(str(int(data_del[1]) + int(data_del[2])))
+		if(data_split[0] == "+"):
+			client.send('200 ' + str(int(data_split[1]) + int(data_split[2])))
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "-"):
-			client.send(str(int(data_del[1]) - int(data_del[2])))
+
+		elif(data_split[0] == "-"):
+			client.send('200 ' + str(int(data_split[1]) - int(data_split[2])))
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "*"):
-			client.send(str(int(data_del[1]) * int(data_del[2])))
+
+		elif(data_split[0] == "*"):
+			client.send('200 ' + str(int(data_split[1]) * int(data_split[2])))
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "/"):
-			if int(data_del[2]) == 0:
-				client.send("Attempted division by zero. Try again. \"OC 1 2\"")
-				print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+
+		elif(data_split[0] == "/"):
+			if int(data_split[2]) == 0:
+				client.send("300 -1 Attempted division by zero. Try again. \"OC 1 2\"")
+				print "    Processing done. Invalid data.\n[*] Reply sent"
 				continue
-			client.send(str(int(data_del[1]) / int(data_del[2])))
+			client.send('200 ' + str(int(data_split[1]) / int(data_split[2])))
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "X"):
-			client.send("Goodbye")
-			print "    Processing done.\n[*] Reply sent"
-			client.close()
-			break
+
 		else:
-			client.send("Invalid operator. Try again. \"OC 1 2\"")
-			print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+			client.send("300 -1 Invalid operator. Try again. \"OC 1 2\"")
+			print "    Processing done. Invalid data.\n[*] Reply sent"
+
+	print "[*] Disconnected from ", addr_cl[0], ":", addr_cl[1]
+
+	client.close()
 
 server.close()
-
-
-
-
-
-#fun: >>> import socket
-#>>> name = socket.gethostname()
-#>>> print name
-#Noahs-MacBook-Pro-3.local
-#>>> socket.gethostbyname(name)
-#'10.0.0.15'
