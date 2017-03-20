@@ -1,10 +1,5 @@
 import socket
-
-#create TCP socket object
-#bind it to an address
-#receive an incoming connection from a client
-#recieve data from client
-#send data to client
+import random
 
 def isInteger(value):
 	try:
@@ -13,73 +8,59 @@ def isInteger(value):
 	except ValueError:
 		return False
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ip = "10.0.0.15"
-port = 50001
-address = (ip, port)
+addr = ( socket.gethostbyname(socket.gethostname()), 50010 )
+server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+server.bind(addr)
 
-server.bind(address)
-server.listen(2)
-print "[*] Started listening on", ip, ":", port
-
-client, addr_cl = server.accept()
-print "[*] Got a connection from ", addr_cl[0], ":", addr_cl[1]
+print "[*] Server open on", addr[0], ":", addr[1]
 
 while True:
-	data = client.recv(1024)
+	data, addr_cl = server.recvfrom(1024)
+	#if random.randrange(10) > 4:
+		#continue
+	print "received message \"", data, "\" from ", addr_cl[0], " : ", addr_cl[1]
+
 	if not data:
+		server.sendto("300 -1 Incorrect format. Try again. \"OC 1 2\"", addr_cl)
+		print "[*] Reply sent ", addr_cl[0], ":", addr_cl[1]
 		continue
-	data_del = data.split(" ")
+
+	data_split = data.split(" ")
 
 	print "[*] Received \'", data, "\' from the client."
-	print "    Processing data: "
+	print "    Processing data. "
 
-	if not (isInteger(data_del[1]) and isInteger(data_del[2])):
-		client.send("Noninteger operands. Try again. \"OC 1 2\"")
-		print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+	if len(data_split) != 3:
+		server.sendto("300 -1 Incorrect format. Try again. \"OC 1 2\"", addr_cl)
+		print "[*] Reply sent ", addr_cl[0], ":", addr_cl[1]
+		continue
+
+	if not (isInteger(data_split[1]) and isInteger(data_split[2])):
+		server.sendto("300 -1 Noninteger operands. Try again. \"OC 1 2\"", addr_cl)
+		print "    Processing done. Invalid data.\n[*] Reply sent"
 	else:
-		if(data_del[0] == "+"):
-			client.send(str(int(data_del[1]) + int(data_del[2])))
+		if(data_split[0] == "+"):
+			server.sendto('200 ' + str(int(data_split[1]) + int(data_split[2])), addr_cl)
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "-"):
-			client.send(str(int(data_del[1]) - int(data_del[2])))
+
+		elif(data_split[0] == "-"):
+			server.sendto('200 ' + str(int(data_split[1]) - int(data_split[2])), addr_cl)
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "*"):
-			client.send(str(int(data_del[1]) * int(data_del[2])))
+
+		elif(data_split[0] == "*"):
+			server.sendto('200 ' + str(int(data_split[1]) * int(data_split[2])), addr_cl)
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "/"):
-			if int(data_del[2]) == 0:
-				client.send("Attempted division by zero. Try again. \"OC 1 2\"")
-				print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+
+		elif(data_split[0] == "/"):
+			if int(data_split[2]) == 0:
+				server.sendto("300 -1 Attempted division by zero. Try again. \"OC 1 2\"", addr_cl)
+				print "    Processing done. Invalid data.\n[*] Reply sent"
 				continue
-			client.send(str(int(data_del[1]) / int(data_del[2])))
+			server.sendto('200 ' + str(int(data_split[1]) / int(data_split[2])), addr_cl)
 			print "    Processing done.\n[*] Reply sent"
-			#client.close()
-			#break
-		elif(data_del[0] == "X"):
-			client.send("Goodbye")
-			print "    Processing done.\n[*] Reply sent"
-			client.close()
-			break
+
 		else:
-			client.send("Invalid operator. Try again. \"OC 1 2\"")
-			print "    Processing interrupted. Invalid data.\n[*] Reply sent"
+			server.sendto("300 -1 Invalid operator. Try again. \"OC 1 2\"", addr_cl)
+			print "    Processing done. Invalid data.\n[*] Reply sent"
 
 server.close()
-
-
-
-
-
-#fun: >>> import socket
-#>>> name = socket.gethostname()
-#>>> print name
-#Noahs-MacBook-Pro-3.local
-#>>> socket.gethostbyname(name)
-#'10.0.0.15'
