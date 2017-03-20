@@ -16,8 +16,8 @@ print "[*] Server open on", addr[0], ":", addr[1]
 
 while True:
 	data, addr_cl = server.recvfrom(1024)
-	#if random.randrange(10) > 4:
-		#continue
+	if random.randrange(10) > 4:
+		continue
 	print "received message \"", data, "\" from ", addr_cl[0], " : ", addr_cl[1]
 
 	if not data:
