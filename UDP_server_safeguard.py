@@ -1,6 +1,7 @@
 import socket
 import random
 
+#method used to test input validity
 def isInteger(value):
 	try:
 		int(value)
@@ -8,17 +9,29 @@ def isInteger(value):
 	except ValueError:
 		return False
 
+#creates socket and binds to address
 addr = ( socket.gethostbyname(socket.gethostname()), 50010 )
 server = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 server.bind(addr)
 
 print "[*] Server open on", addr[0], ":", addr[1]
 
+
 while True:
+
+	#recieves data
 	data, addr_cl = server.recvfrom(1024)
-	#if random.randrange(10) > 4:
-		#continue
+
+	#drops packet 50% of the time
+	if random.randrange(10) > 4:
+		continue
 	print "received message \"", data, "\" from ", addr_cl[0], " : ", addr_cl[1]
+
+
+	
+	# below handles and responds to data, valid and invalid:
+	# this is exactly the same as TCP_server except it does not close a client socket
+
 
 	if not data:
 		server.sendto("300 -1 Incorrect format. Try again. \"OC 1 2\"", addr_cl)
